@@ -10,8 +10,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: app.handler
-      Runtime: nodejs12.x
+      Handler: app.create
+      Runtime: nodejs14.x
       Timeout: 3
       Environment:
         Variables:
@@ -21,6 +21,34 @@ Resources:
         ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
         - DynamoDBWritePolicy:
             TableName: !Ref DynamoTable
+      Events:
+        CreateData:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /create
+            Method: get
+
+  LambdaListDynamoDB:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.list
+      Runtime: nodejs14.x
+      Timeout: 3
+      Environment:
+        Variables:
+          DatabaseTable: !Ref DynamoTable
+      Policies:
+        ## Read more about SAM Policy templates at:
+        ## https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+        - DynamoDBReadPolicy:
+            TableName: !Ref DynamoTable
+      Events:
+        ListData:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /list
+            Method: get
 
         
 ##########################################################################
@@ -41,9 +69,13 @@ Resources:
 ##########################################################################
   
 Outputs:
-  LambdFunction:
+  LambdCreateFunction:
     Value: !Ref LambdaPutDynamoDB
     Description: LambdaPutDynamoDB function  Arn
+
+  LambdListFunction:
+    Value: !Ref LambdaListDynamoDB
+    Description: LambdaListDynamoDB function  Arn
 
   DynamoDbTable:
     Value: !Ref DynamoTable
