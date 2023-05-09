@@ -13,7 +13,7 @@ exports.create = async (event) => {
         Item: {
             ID: Math.floor(Math.random() * Math.floor(10000000)).toString(),
             created: moment().format('YYYYMMDD-hhmmss'),
-            metadata: JSON.stringify(event),
+            metadata: JSON.stringify(event.body),
         }
     }
     try {
